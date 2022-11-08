@@ -1,38 +1,46 @@
 import React, {useState} from 'react'
-import axios from 'axios';
+import { useEffect } from 'react';
 
-const ProductForm = () => {
-    const [title, setTitle] = useState("");
-    const [price, setPrice] = useState("");
-    const [description, setDescription] = useState("");
+const ProductForm = (props) => {
+
+    const [inputs, setInputs] = useState({
+        title: "",
+        price: "",
+        description: ""
+    })
+
+    useEffect( () => { 
+        if(props.inputs) {
+            setInputs(props.inputs)
+        }
+    }, [props])
 
     const submitHandler = (e) => {
         e.preventDefault();
-        console.log("submitted")
-        axios.post('http://localhost:8000/api/product/new', {
-            title,
-            price,
-            description
+        props.submitHandler(inputs);
+        setInputs({
+            title: "",
+            price: "",
+            description: ""
         })
-            .then( res => console.log(res) )
-            .catch( err => console.log(err) );
-        setTitle("")
-        setPrice("")
-        setDescription("")
+    }
+
+    const handleInputChange = (e) => {
+        const newInput = {...inputs, [e.target.name] : e.target.value};
+        setInputs(newInput);
     }
 
     return (
         <div>
-            <h2>Product Manager</h2>
             <form onSubmit={ submitHandler }>
-                <label>Title</label>
-                <input onChange={ e => setTitle(e.target.value) } value={title}></input>
+                <label>Title </label>
+                <input name='title' onChange={ handleInputChange } value={inputs.title}></input>
                 <br></br><br></br>
-                <label>Price</label>
-                <input type='number' onChange={ e => setPrice(e.target.value) } value={price}></input>
+                <label>Price </label>
+                <input name='price' type='number' onChange={ handleInputChange } value={inputs.price}></input>
                 <br></br><br></br>
-                <label>Description</label>
-                <textarea onChange={ e => setDescription(e.target.value) } value={description}></textarea>
+                <label>Description </label>
+                <textarea name='description' onChange={ handleInputChange } value={inputs.description}></textarea>
                 <br></br><br></br>
                 <button>Submit</button>
             </form>
